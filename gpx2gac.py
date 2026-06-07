@@ -107,7 +107,14 @@ def round_grad(grad_value):
 
 
 def parse_time_seconds(gpx_time):
-    return int(gpx_time[11:13]) * 3600 + int(gpx_time[14:16]) * 60 + int(gpx_time[17:19])
+    seconds = int(gpx_time[11:13]) * 3600 + int(gpx_time[14:16]) * 60 + int(gpx_time[17:19])
+    # Include fractional seconds: GPS clock resyncs produce timestamps like
+    # 09:34:41.999 -> 09:34:43.000 (dt = 1.001 s); truncating to whole seconds
+    # would compute dt = 2 s and understate the speed by half.
+    frac = gpx_time[19:].rstrip("Zz")
+    if frac.startswith("."):
+        seconds += float(frac)
+    return seconds
 
 
 def convert(gpx_path, gac_path, pilot="UNKNOWN", aircraft_type="UNKNOWN", aircraft_id="UNKNOWN"):
@@ -161,7 +168,7 @@ def convert(gpx_path, gac_path, pilot="UNKNOWN", aircraft_type="UNKNOWN", aircra
             # original assumes 1 Hz fixes (dis * 3600); divide by actual dt for robustness
             dt = secs - last_secs
             if dt <= 0:
-                dt = 1
+                dt = 1.0
             groundspeed = min(dis * 3600 / dt, 999.9)
 
         lines.append(

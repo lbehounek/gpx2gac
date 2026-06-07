@@ -60,6 +60,27 @@ class TestFieldFormatters(unittest.TestCase):
     def test_time_str_plain(self):
         self.assertEqual(gac_time_str("2010-08-28T09:39:32Z"), "093932")
 
+    def test_fractional_seconds_in_speed_dt(self):
+        # GPS clock resync: 41.999 -> 43.000 is 1.001 s, not 2 s; whole-second
+        # truncation would halve the computed speed (found by cross-validating
+        # against GPSBabel's millisecond-precision implementation)
+        gpx = SAMPLE_GPX.replace(
+            'lat="50.0" lon="13.001"><ele>304.8</ele><time>2026-06-07T10:00:01.00000Z',
+            'lat="50.0" lon="13.001"><ele>304.8</ele><time>2026-06-07T10:00:01.99900Z',
+        ).replace(
+            'lat="50.001" lon="13.001"><ele>152.4</ele><time>2026-06-07T10:00:03.00000Z',
+            'lat="50.001" lon="13.001"><ele>152.4</ele><time>2026-06-07T10:00:03.00000Z',
+        )
+        with tempfile.TemporaryDirectory() as tmp:
+            gpx_path = Path(tmp) / "frac.gpx"
+            gac_path = Path(tmp) / "frac.gac"
+            gpx_path.write_text(gpx)
+            convert(str(gpx_path), str(gac_path))
+            b_records = [l for l in gac_path.read_text().splitlines() if l.startswith("B")]
+            # leg 2->3: 0.06 NM northward over 1.001 s (not 2 s)
+            # 0.06 * 3600 / 1.001 = 215.78 kt -> GSP 2158
+            self.assertEqual(b_records[2][35:39], "2158")
+
     def test_date_str_ddmmyy(self):
         # matches AFLOS logger convention: HFDTE280810 = 28 Aug 2010
         self.assertEqual(gac_date_str("2010-08-28T09:39:32Z"), "280810")
