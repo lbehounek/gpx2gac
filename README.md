@@ -15,7 +15,10 @@ python3 gpx2gac.py flight.gpx output.gac   # explicit output path
 python3 gpx2gac.py --pilot "Novak Jan" --aircraft-type C152 --aircraft-id OK-ABC flight.gpx
 ```
 
-No dependencies — Python 3 stdlib only.
+No dependencies — Python 3 stdlib only. If you convert GPX files from
+untrusted sources, install the hardened XML parser:
+`pip install 'gpx2gac[secure]'` (defusedxml — protects against XXE and
+entity-expansion attacks; used automatically when present).
 
 ## Output format
 

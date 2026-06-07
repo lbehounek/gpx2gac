@@ -6,6 +6,9 @@ requires-python = ">=3.9"
 license = { text = "GPL-3.0-or-later" }
 authors = [{ name = "Lukáš Běhounek", email = "l.behounek@gmail.com" }]
 
+[project.optional-dependencies]
+secure = ["defusedxml>=0.7.1"]  # hardened XML parsing for untrusted GPX input
+
 [project.scripts]
 gpx2gac = "gpx2gac:main"
 

@@ -18,8 +18,17 @@ This port: Copyright 2026 Lukas Behounek. Licensed under GPL-3.0-or-later.
 import argparse
 import math
 import sys
-import xml.etree.ElementTree as ET
 from decimal import Decimal, ROUND_HALF_EVEN
+
+try:
+    # Hardened against XXE / entity-expansion bombs ("billion laughs") when
+    # available: pip install defusedxml (or: pip install 'gpx2gac[secure]')
+    from defusedxml.ElementTree import parse as xml_parse
+except ImportError:
+    # Stdlib fallback keeps the script zero-dependency. Acceptable when
+    # converting your own logger's GPX output; install defusedxml if you
+    # process GPX files from untrusted sources.
+    from xml.etree.ElementTree import parse as xml_parse  # nosemgrep: python.lang.security.use-defused-xml.use-defused-xml
 
 CONVERTER_VERSION = "1.0"
 GACFORMAT_DEF = "I033639GSP4042TRT4346FXA"
@@ -102,7 +111,7 @@ def parse_time_seconds(gpx_time):
 
 
 def convert(gpx_path, gac_path, pilot="UNKNOWN", aircraft_type="UNKNOWN", aircraft_id="UNKNOWN"):
-    root = ET.parse(gpx_path).getroot()
+    root = xml_parse(gpx_path).getroot()  # nosemgrep: python.lang.security.use-defused-xml-parse.use-defused-xml-parse
     tracks = [e for e in root if localname(e.tag) == "trk"]
     if len(tracks) != 1:
         raise SystemExit(f"Error: expected exactly 1 track, found {len(tracks)}")
