@@ -1,0 +1,7 @@
+version: 2
+updates:
+  # only ecosystem present: stdlib-only Python, no package deps to watch
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
