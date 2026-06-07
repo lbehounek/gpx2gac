@@ -1,0 +1,23 @@
+
+name: tag-on-merge
+on:
+  pull_request:
+    types: [closed]
+    branches: [main]
+
+jobs:
+  bump-and-tag:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ github.event.pull_request.merge_commit_sha }}
+          fetch-depth: 0
+
+      - name: Bump version and push tag
+        uses: lbehounek/tag-on-merge-action@v1
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}

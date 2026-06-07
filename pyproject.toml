@@ -1,0 +1,17 @@
+[project]
+name = "gpx2gac"
+version = "1.0.0"
+description = "GPX to GAC track converter for precision/rally flying scoring software (FlightContest, PrecisWin)"
+requires-python = ">=3.9"
+license = { text = "GPL-3.0-or-later" }
+authors = [{ name = "Lukáš Běhounek", email = "l.behounek@gmail.com" }]
+
+[project.scripts]
+gpx2gac = "gpx2gac:main"
+
+[build-system]
+requires = ["setuptools>=69"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+py-modules = ["gpx2gac"]
