@@ -5,3 +5,9 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
+    # Wait 7 days before proposing newly published versions — guards against
+    # supply-chain attacks where a compromised release is caught & yanked in
+    # its first days. Also satisfies Semgrep's dependabot-missing-cooldown rule
+    # enforced in the Security Checks workflow.
+    cooldown:
+      default-days: 7
