@@ -19,6 +19,6 @@ jobs:
           fetch-depth: 0
 
       - name: Bump version and push tag
-        uses: lbehounek/tag-on-merge-action@ff60e511402a83e4bae61c72472241abf2fd6ba4  # v1
+        uses: lbehounek/tag-on-merge-action@e9764e86fc2b9928b105e2c2f2b240cb422e12fc  # v1
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
